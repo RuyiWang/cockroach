@@ -1564,6 +1564,10 @@ func (r *Replica) addWriteCmd(
 				} else {
 					log.Warningf(ctx, "unable to cancel expired Raft command %s", ba)
 				}
+			case <-r.store.stopper.ShouldQuiesce():
+				if tryAbandon() {
+					pErr = roachpb.NewError(&roachpb.NodeUnavailableError{})
+				}
 			}
 		}
 	} else {
